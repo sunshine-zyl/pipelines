@@ -180,8 +180,9 @@ def _poll_job(job_uri, creds) -> dict:
         'Authorization': 'Bearer ' + creds.token
     }
     job = requests.get(job_uri, headers=headers).json()
-    if 'status' in job and ('errors' in job['status'] or
-                            'errorResult' in job['status']):
+    if 'status' in job and (job['status']['state'].lower() not in [
+        'pending', 'running', 'done'
+    ]) and ('errors' in job['status'] or 'errorResult' in job['status']):
       raise RuntimeError('The BigQuery job failed. Error: {}'.format(
           job['status']))
 
